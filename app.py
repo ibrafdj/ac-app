@@ -35,7 +35,7 @@ st.title('SejukHemat')
 
 # Temp options
 temp_room = st.number_input('Berapa suhu di ruanganmu saat ini? (dalam °C):', min_value=0.0)
-temp_ac = st.number_input('Berapa suhu AC yang biasa kamu pilih di ruanganmu? (dalam °C):', min_value=0.0)
+temp_ac = st.number_input('Berapa suhu AC yang biasa kamu pilih di ruanganmu? (dalam °C):', min_value=16.0, max_value=30.0)
 
 # Rate options
 rate_options = ['900VA', '1300VA', '2200VA', '>=3500VA']
