@@ -1,6 +1,4 @@
 import streamlit as st
-import locale
-locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
 
 # Function to calculate power usage
 def calculate_power_consumption(setpoint_temp, outside_temp, efficiency):
@@ -30,6 +28,9 @@ def calculate_power_consumption(setpoint_temp, outside_temp, efficiency):
 # Function to calculate electricity bills 
 def calculate_electricity_bills(kwh, rate):
     return kwh * rate
+
+def float_to_currency(value: float, currency_symbol: str = '$') -> str:
+    return f"{currency_symbol}{format(value, ',.2f')}"
 
 st.title('SejukHemat')
 
@@ -84,6 +85,6 @@ if st.button('Hitung'):
     # TODO: Create feature to visualize amount of money that can be saved from your energy bills based on the selected VA rating.
     total_kwh = power_diff * hours / 1000
     total_bills = calculate_electricity_bills(total_kwh, rate)
-    total_idr = locale.currency(total_bills, grouping=True)
+    total_idr = float_to_currency(total_bills, 'Rp')
     st.write(f"Berapa banyak tagihan listrik yang bisa dihemat dalam sebulan dengan memilih temperatur optimum?")
     st.write(f"Total tagihan listrik yang dapat dihemat adalah sebesar **{total_idr}**")
