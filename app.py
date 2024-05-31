@@ -1,4 +1,6 @@
 import streamlit as st
+import locale
+locale.setlocale(locale.LC_ALL, 'id_ID.UTF-8')
 
 # Function to calculate power usage
 def calculate_power_consumption(setpoint_temp, outside_temp, efficiency):
@@ -25,29 +27,63 @@ def calculate_power_consumption(setpoint_temp, outside_temp, efficiency):
 
     return power_consumption
 
-st.title('Seberapa efisien penggunaan AC kamu?')
+# Function to calculate electricity bills 
+def calculate_electricity_bills(kwh, rate):
+    return kwh * rate
 
+st.title('SejukHemat')
+
+# Temp options
 temp_room = st.number_input('Berapa suhu di ruanganmu saat ini? (dalam °C):', min_value=0.0)
-temp_ac = st.number_input('Berapa suhu AC kamu biasanya? (dalam °C):', min_value=0.0)
+temp_ac = st.number_input('Berapa suhu AC yang biasa kamu pilih di ruanganmu? (dalam °C):', min_value=0.0)
+
+# Rate options
+rate_options = ['900VA', '1300VA', '2200VA', '>=3500VA']
+selected_rate_option = st.selectbox('Pilih daya yang terpasang di rumah:', rate_options)
+# Hour options
+hours = st.number_input('Berapa lama AC di ruanganmu menyala setiap harinya? (Dalam jam):', min_value=0, max_value=24, value=8)
+
+match selected_rate_option:
+    case '900VA':
+        rate = 1352
+    case '1300VA':
+        rate = 1444.7
+    case '2200VA':
+        rate = 1444.7
+    case '>=3500VA':
+        rate = 1699.53
+
+# with st.popover("Open popover"):
+#     st.markdown("Hello World 👋")
+#     name = st.text_input("What's your name?")
+#     st.write("Your name:", name)
 
 if st.button('Hitung'):
-    temp_diff = abs(temp_room - temp_ac)
-    if temp_diff > 20:
-        st.write("Perbedaan suhu antara ruangan Anda dan suhu terpilih AC terlalu besar. Suhu paling efisien dari segi energi untuk ruangan Anda adalah antara 22 hingga 25,5 derajat Celsius.")
-        recommended_temp = 25.5
-
-        power_user = calculate_power_consumption(temp_ac, temp_room, 1)
-        power_recommended = calculate_power_consumption(recommended_temp, temp_room, 1)
-        power_diff = power_user - power_recommended
-        st.write(f"Perbedaan Daya: {power_diff} Watt")
-        st.write(f"Persentase Perbedaan: {(power_diff / power_user) * 100}%")
-        
-        st.bar_chart({'Power (W)': {"Current":power_user, "Reccommended":power_recommended}})
-        # st.bar_chart({'Power (W)': [power_user, power_recommended]})
-        # label_user = "Power at" + str(temp_ac)
-        # label_recommended = "Power at" + str(recommended_temp)
-        # power_data=pd.DataFrame({'{label_user}':[power_user], '{label_recommended}':[power_recommended]})
-        # st.bar_chart(data=power_data)
+    # TODO: May not be scientific to use temp diff, better to check if it is below 5C (Setpoint=19.5C) or above 32C (Setpoint=25.5C)
+    if(temp_room <= 5):
+        temp_optimal = 19.5
+    elif (temp_room >= 32):
+        temp_optimal = 25.5
     else:
-        st.write("Kamu sudah menggunakan AC dengan efisien!")
-        recommended_temp = temp_ac
+        temp_optimal = 24 #???
+
+    temp_diff = abs(temp_room - temp_ac)
+    if temp_diff <= 0.5:
+        st.write(f"Temperatur pas!")
+    else:
+        st.write(f"Perbedaan suhu antara ruangan Anda dan suhu terpilih AC terlalu besar. Suhu paling optimal untuk kondisi Anda adalah {temp_optimal} derajat Celsius.")
+
+    power_user = calculate_power_consumption(temp_ac, temp_room, 1)
+    power_optimal = calculate_power_consumption(temp_optimal, temp_room, 1)
+    power_diff = power_user - power_optimal
+    st.write(f"Perbedaan Daya: {power_diff} Watt")
+    st.write(f"Persentase Perbedaan: {(power_diff / power_user) * 100}%")
+    st.bar_chart({'Power (W)': {"Current":power_user, "Optimal":power_optimal}})
+
+    # TODO: Change power estimation function to just assume a % increase in power consumption at every increase/decrease in degree celcius
+    # TODO: Create feature to visualize amount of money that can be saved from your energy bills based on the selected VA rating.
+    total_kwh = power_diff * hours / 1000
+    total_bills = calculate_electricity_bills(total_kwh, rate)
+    total_idr = locale.currency(total_bills, grouping=True)
+    st.write(f"Berapa banyak tagihan listrik yang bisa dihemat dalam sebulan dengan memilih temperatur optimum?")
+    st.write(f"Total tagihan listrik yang dapat dihemat adalah sebesar **{total_idr}**")
