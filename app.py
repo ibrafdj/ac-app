@@ -33,7 +33,7 @@ height = st.number_input('Berapa tinggi ruanganmu? (dalam m):', min_value=0.0, v
 rate_options = ['900VA', '1300VA', '2200VA', '>=3500VA']
 selected_rate_option = st.selectbox('Pilih kelompok daya listrik PLN yang terpasang di rumah:', rate_options)
 # Hour options
-hours = st.number_input('Berapa lama AC di ruanganmu menyala setiap harinya? (Dalam jam):', min_value=0, max_value=24, value=8)
+hours = st.number_input('Berapa lama AC di ruanganmu menyala setiap harinya? (dalam jam):', min_value=0, max_value=24, value=8)
 
 match selected_rate_option:
     case '900VA':
@@ -53,9 +53,9 @@ match selected_rate_option:
 if st.button('Hitung'):
     # TODO: May not be scientific to use temp diff, better to check if it is below 5C (Setpoint=19.5C) or above 32C (Setpoint=25.5C)
     if(temp_room < temp_ac):
-        st.write(f"Suhu dalam ruanganmu lebih rendah dari suhu AC. Di kondisi dingin seperti sebaiknya matikan AC saja untuk menghemat energi ya!")
+        st.write(f"Suhu diluar ruanganmu lebih rendah dari suhu AC. Di kondisi dingin seperti sebaiknya matikan AC saja untuk menghemat energi ya!")
     elif(temp_room < 25):
-        st.write(f"Suhu dalam ruanganmu masuk dalam suhu yang cukup nyaman untuk manusia beraktivitas. Di kondisi dingin seperti sebaiknya matikan AC saja untuk menghemat energi ya!")
+        st.write(f"Suhu diluar ruanganmu masuk dalam suhu yang cukup nyaman untuk manusia beristirahat. Di kondisi dingin seperti sebaiknya matikan AC saja untuk menghemat energi ya!")
     else:
         if(temp_room <= 5):
             temp_optimal = 19.5
